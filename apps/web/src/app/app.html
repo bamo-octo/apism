@@ -1,0 +1,46 @@
+<header class="entete">
+  <div class="entete__marque">
+    <span class="entete__logo" aria-hidden="true">☕</span>
+    <div>
+      <p class="entete__titre">MyBrew</p>
+      <p class="entete__etape">{{ configuration.etape }}</p>
+    </div>
+  </div>
+
+  <nav class="navigation">
+    <a routerLink="/" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }">
+      Catalogue
+    </a>
+    <a routerLink="/historique" routerLinkActive="actif">Historique</a>
+    <a routerLink="/machine" routerLinkActive="actif">Machine</a>
+    @if (session.aLeRole('administrateur')) {
+      <a routerLink="/statistiques" routerLinkActive="actif">Statistiques</a>
+    }
+    <a routerLink="/mon-jeton" routerLinkActive="actif">Mon jeton</a>
+  </nav>
+
+  <div class="entete__session">
+    @if (!session.authentificationActivee) {
+      <span class="etiquette etiquette--alerte">Sans authentification</span>
+    } @else if (session.estAuthentifie()) {
+      <div class="entete__utilisateur">
+        <span class="entete__nom">{{ session.nomAffiche() }}</span>
+        <span class="entete__roles">{{ session.roles().join(' · ') || 'aucun role' }}</span>
+      </div>
+      <button type="button" class="bouton" (click)="session.deconnexion()">Se deconnecter</button>
+    } @else {
+      <button type="button" class="bouton bouton--principal" (click)="session.connexion()">
+        Se connecter
+      </button>
+    }
+  </div>
+</header>
+
+<main class="contenu">
+  <router-outlet />
+</main>
+
+<footer class="pied">
+  <span>Formation « Securiser et Manager son API »</span>
+  <span>API : <code>{{ configuration.urlApi }}</code></span>
+</footer>

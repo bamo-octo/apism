@@ -1,0 +1,259 @@
+# Architecture finale du TP « Securiser et Manager son API ».
+#
+#   Navigateur ──> SPA MyBrew (nginx, :4200)
+#        │
+#        ├──> Keycloak (:8080)            Authorization Code + PKCE, OIDC
+#        │
+#        └──> Gateway Gravitee (:8082) ──> API MyBrew (NestJS, non publiee)
+#                                            ▲
+#   Sonde machine ──> Gateway (client_credentials) ────┘
+#
+# Console Gravitee : http://localhost:8084   Portail : http://localhost:4100
+# API de management : http://localhost:8083
+
+name: mybrew
+
+networks:
+  mybrew:
+    name: mybrew
+
+volumes:
+  donnees-mongo:
+  donnees-elasticsearch:
+
+services:
+  # ---------------------------------------------------------------------------
+  # Serveur d'autorisation
+  # ---------------------------------------------------------------------------
+  keycloak:
+    image: keycloak/keycloak:${VERSION_KEYCLOAK}
+    container_name: mybrew-keycloak
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      # Le hostname est fige sur l'URL vue par le navigateur : c'est cette
+      # valeur que Keycloak place dans la revendication `iss` des jetons.
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'true'
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_MOT_DE_PASSE_ADMIN}
+      KC_LOG_LEVEL: info
+    # Aucun volume : le realm est reimporte a chaque recreation du conteneur.
+    # C'est voulu, on repart d'un etat propre entre deux etapes du TP.
+    volumes:
+      - ./infra/keycloak/realm-mybrew.json:/opt/keycloak/data/import/realm-mybrew.json:ro
+    ports:
+      - '8080:8080'
+    networks:
+      - mybrew
+
+  # ---------------------------------------------------------------------------
+  # Application MyBrew
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ./apps/api
+    image: mybrew/api:formation
+    container_name: mybrew-api
+    environment:
+      PORT: '3000'
+      SECURITE_ACTIVEE: 'true'
+      # Deux reglages distincts, et c'est volontaire :
+      #  - l'emetteur attendu dans le jeton est l'URL vue par le navigateur ;
+      #  - les cles publiques sont telechargees via le reseau Docker.
+      KEYCLOAK_URL_PUBLIQUE: http://localhost:8080
+      KEYCLOAK_URL_INTERNE: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      JWT_AUDIENCE: mybrew-api
+      ORIGINES_AUTORISEES: http://localhost:4200,http://localhost:8082
+    # L'API n'est PAS publiee sur l'hote : dans l'architecture finale, seule la
+    # gateway peut la joindre. Decommentez pour la debugger en direct.
+    # ports:
+    #   - '3000:3000'
+    networks:
+      - mybrew
+    depends_on:
+      - keycloak
+
+  web:
+    build:
+      context: ./apps/web
+    image: mybrew/web:formation
+    container_name: mybrew-web
+    environment:
+      WEB_URL_API: ${WEB_URL_API}
+      WEB_ETAPE: ${WEB_ETAPE}
+      WEB_AUTHENTIFICATION_ACTIVEE: ${WEB_AUTHENTIFICATION_ACTIVEE}
+      WEB_KEYCLOAK_AUTORITE: http://localhost:8080/realms/${KEYCLOAK_REALM}
+      WEB_KEYCLOAK_CLIENT_ID: mybrew-spa
+      WEB_KEYCLOAK_SCOPES: openid profile email boisson:preparer machine:entretenir statistiques:lire
+    ports:
+      - '4200:80'
+    networks:
+      - mybrew
+
+  sonde:
+    build:
+      context: ./apps/sonde
+    image: mybrew/sonde:formation
+    container_name: mybrew-sonde
+    environment:
+      URL_JETON: http://keycloak:8080/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token
+      CLIENT_ID: mybrew-sonde
+      CLIENT_SECRET: ${SECRET_SONDE}
+      SCOPES: machine:telemetrie
+      # La sonde passe elle aussi par la gateway : aucun appel direct a l'API.
+      URL_API: http://gateway:8082/mybrew
+      INTERVALLE_SECONDES: '20'
+    networks:
+      - mybrew
+    depends_on:
+      - keycloak
+      - gateway
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Gravitee APIM - stockage
+  # ---------------------------------------------------------------------------
+  mongodb:
+    image: mongo:${VERSION_MONGO}
+    container_name: mybrew-mongodb
+    volumes:
+      - donnees-mongo:/data/db
+    healthcheck:
+      test: ['CMD-SHELL', 'mongosh --quiet --eval "db.runCommand({ ping: 1 }).ok" | grep -q 1']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - mybrew
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${VERSION_ELASTIC}
+    container_name: mybrew-elasticsearch
+    environment:
+      http.host: 0.0.0.0
+      transport.host: 0.0.0.0
+      xpack.security.enabled: 'false'
+      cluster.name: mybrew
+      discovery.type: single-node
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile: 65536
+    volumes:
+      - donnees-elasticsearch:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - mybrew
+
+  # ---------------------------------------------------------------------------
+  # Gravitee APIM - plan de donnees et plan de controle
+  # ---------------------------------------------------------------------------
+  gateway:
+    image: graviteeio/apim-gateway:${VERSION_APIM}
+    container_name: mybrew-gateway
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      # Les compteurs de rate limiting et de quota sont partages via MongoDB :
+      # ils resteraient coherents avec plusieurs instances de gateway.
+      gravitee_ratelimit_mongodb_uri: mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      gravitee_reporters_elasticsearch_endpoints_0: http://elasticsearch:9200
+      # Delai de synchronisation avec le plan de controle : 5 s par defaut,
+      # abaisse a 2 s pour que les modifications du TP soient visibles vite.
+      gravitee_services_sync_delay: '2000'
+      gravitee_services_sync_distributed: 'false'
+    ports:
+      - '8082:8082'
+    networks:
+      - mybrew
+
+  management-api:
+    image: graviteeio/apim-management-api:${VERSION_APIM}
+    container_name: mybrew-management-api
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      gravitee_analytics_elasticsearch_endpoints_0: http://elasticsearch:9200
+      gravitee_console_url: http://localhost:8084
+      gravitee_portal_url: http://localhost:4100
+    ports:
+      - '8083:8083'
+    networks:
+      - mybrew
+
+  console:
+    image: graviteeio/apim-management-ui:${VERSION_APIM}
+    container_name: mybrew-console
+    depends_on:
+      - management-api
+    environment:
+      MGMT_API_URL: http://localhost:8083/management/
+    ports:
+      - '8084:8080'
+    networks:
+      - mybrew
+
+  portail:
+    image: graviteeio/apim-portal-ui:${VERSION_APIM}
+    container_name: mybrew-portail
+    depends_on:
+      - management-api
+    environment:
+      PORTAL_API_URL: http://localhost:8083/portal
+    ports:
+      - '4100:8080'
+    networks:
+      - mybrew
+
+  # ---------------------------------------------------------------------------
+  # Amorcage : declare l'API, ses plans et ses souscriptions dans Gravitee.
+  # Conteneur a usage unique, il s'arrete une fois le travail termine.
+  # ---------------------------------------------------------------------------
+  amorcage:
+    image: node:24-alpine
+    container_name: mybrew-amorcage
+    working_dir: /amorcage
+    command: ['node', 'amorcer.mjs']
+    environment:
+      URL_MANAGEMENT_API: http://management-api:8083
+      GRAVITEE_ADMIN: ${GRAVITEE_ADMIN}
+      GRAVITEE_MOT_DE_PASSE_ADMIN: ${GRAVITEE_MOT_DE_PASSE_ADMIN}
+      URL_API_CIBLE: http://api:3000
+      CHEMIN_CONTEXTE: /mybrew
+      # Keycloak vu depuis le reseau Docker : c'est par ce nom d'hote que la
+      # gateway telecharge les cles publiques et appelle l'introspection.
+      URL_REALM_INTERNE: http://keycloak:8080/realms/${KEYCLOAK_REALM}
+      CLIENT_INTROSPECTION: gravitee-introspection
+      SECRET_INTROSPECTION: ${SECRET_GRAVITEE_INTROSPECTION}
+      LIMITE_DEBIT_PAR_MINUTE: ${LIMITE_DEBIT_PAR_MINUTE}
+      QUOTA_PAR_JOUR: ${QUOTA_PAR_JOUR}
+      ORIGINE_SPA: http://localhost:4200
+    volumes:
+      - ./infra/gravitee/amorcage:/amorcage
+    depends_on:
+      - management-api
+    networks:
+      - mybrew
+    restart: 'no'

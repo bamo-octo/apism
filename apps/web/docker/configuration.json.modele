@@ -1,0 +1,11 @@
+{
+  "urlApi": "${WEB_URL_API}",
+  "etape": "${WEB_ETAPE}",
+  "authentificationActivee": ${WEB_AUTHENTIFICATION_ACTIVEE},
+  "keycloak": {
+    "autorite": "${WEB_KEYCLOAK_AUTORITE}",
+    "clientId": "${WEB_KEYCLOAK_CLIENT_ID}",
+    "scopes": "${WEB_KEYCLOAK_SCOPES}"
+  },
+  "cleApiGravitee": "${WEB_CLE_API_GRAVITEE}"
+}

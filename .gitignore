@@ -1,0 +1,14 @@
+# Dependances et resultats de build
+node_modules/
+dist/
+.angular/
+*.tsbuildinfo
+
+# Sorties generees a l'execution
+infra/gravitee/amorcage/sortie/
+
+# Editeurs et systemes
+.idea/
+.vscode/
+.DS_Store
+*.log

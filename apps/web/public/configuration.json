@@ -1,0 +1,10 @@
+{
+  "urlApi": "http://localhost:8082/mybrew",
+  "etape": "Etape 10 - architecture finale",
+  "authentificationActivee": true,
+  "keycloak": {
+    "autorite": "http://localhost:8080/realms/mybrew",
+    "clientId": "mybrew-spa",
+    "scopes": "openid profile email boisson:preparer machine:entretenir statistiques:lire"
+  }
+}

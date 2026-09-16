@@ -1,0 +1,15 @@
+{
+  "name": "mybrew-sonde",
+  "version": "1.0.0",
+  "description": "Sonde embarquee de la machine MyBrew : client OAuth 2.0 en flow client_credentials",
+  "private": true,
+  "type": "module",
+  "main": "src/sonde.js",
+  "scripts": {
+    "start": "node src/sonde.js",
+    "jeton": "node src/sonde.js --jeton-seulement"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
