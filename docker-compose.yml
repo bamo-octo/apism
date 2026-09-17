@@ -2,7 +2,7 @@
 #
 #   Navigateur ──> SPA MyBrew (nginx, :4200)
 #        │
-#        ├──> Keycloak (:8080)            Authorization Code + PKCE, OIDC
+#        ├──> Keycloak (:18080)            Authorization Code + PKCE, OIDC
 #        │
 #        └──> Gateway Gravitee (:8082) ──> API MyBrew (NestJS, non publiee)
 #                                            ▲
@@ -32,13 +32,16 @@ services:
       - start-dev
       - --import-realm
     environment:
-      # Le hostname est fige sur l'URL vue par le navigateur : c'est cette
-      # valeur que Keycloak place dans la revendication `iss` des jetons.
-      KC_HOSTNAME: http://localhost:8080
+      # KC_HOSTNAME fixe l'URL vue par le navigateur (revendication `iss` des jetons).
+      # En developpement local : http://localhost:18080
+      # En formation : surcharge via .env avec l'URL HTTPS du pod code-server.
+      KC_HOSTNAME: ${KC_HOSTNAME:-http://localhost:18080}
       KC_HOSTNAME_STRICT: 'false'
       KC_HTTP_ENABLED: 'true'
       KC_HEALTH_ENABLED: 'true'
       KC_METRICS_ENABLED: 'true'
+      # En formation derriere un reverse-proxy HTTPS : xforwarded (sinon laisser vide).
+      KC_PROXY_HEADERS: ${KC_PROXY_HEADERS:-}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_MOT_DE_PASSE_ADMIN}
       KC_LOG_LEVEL: info
@@ -47,7 +50,8 @@ services:
     volumes:
       - ./infra/keycloak/realm-mybrew.json:/opt/keycloak/data/import/realm-mybrew.json:ro
     ports:
-      - '8080:8080'
+      # Port 18080 pour eviter le conflit avec code-server (8080) en formation EKS.
+      - '18080:8080'
     networks:
       - mybrew
 
@@ -65,11 +69,11 @@ services:
       # Deux reglages distincts, et c'est volontaire :
       #  - l'emetteur attendu dans le jeton est l'URL vue par le navigateur ;
       #  - les cles publiques sont telechargees via le reseau Docker.
-      KEYCLOAK_URL_PUBLIQUE: http://localhost:8080
+      KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
       KEYCLOAK_URL_INTERNE: http://keycloak:8080
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       JWT_AUDIENCE: mybrew-api
-      ORIGINES_AUTORISEES: http://localhost:4200,http://localhost:8082
+      ORIGINES_AUTORISEES: ${ORIGINES_AUTORISEES:-http://localhost:4200,http://localhost:8082}
     # L'API n'est PAS publiee sur l'hote : dans l'architecture finale, seule la
     # gateway peut la joindre. Decommentez pour la debugger en direct.
     # ports:
@@ -88,7 +92,7 @@ services:
       WEB_URL_API: ${WEB_URL_API}
       WEB_ETAPE: ${WEB_ETAPE}
       WEB_AUTHENTIFICATION_ACTIVEE: ${WEB_AUTHENTIFICATION_ACTIVEE}
-      WEB_KEYCLOAK_AUTORITE: http://localhost:8080/realms/${KEYCLOAK_REALM}
+      WEB_KEYCLOAK_AUTORITE: ${WEB_KEYCLOAK_AUTORITE:-http://localhost:18080/realms/mybrew}
       WEB_KEYCLOAK_CLIENT_ID: mybrew-spa
       WEB_KEYCLOAK_SCOPES: openid profile email boisson:preparer machine:entretenir statistiques:lire
     ports:
@@ -196,8 +200,9 @@ services:
     environment:
       gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
       gravitee_analytics_elasticsearch_endpoints_0: http://elasticsearch:9200
-      gravitee_console_url: http://localhost:8084
-      gravitee_portal_url: http://localhost:4100
+      # URLs publiques de la console et du portail (pour les redirections CORS de l'API de management).
+      gravitee_console_url: ${GRAVITEE_CONSOLE_URL:-http://localhost:8084}
+      gravitee_portal_url: ${GRAVITEE_PORTAL_URL:-http://localhost:4100}
     ports:
       - '8083:8083'
     networks:
@@ -209,7 +214,7 @@ services:
     depends_on:
       - management-api
     environment:
-      MGMT_API_URL: http://localhost:8083/management/
+      MGMT_API_URL: ${MGMT_API_URL:-http://localhost:8083/management/}
     ports:
       - '8084:8080'
     networks:
@@ -221,7 +226,7 @@ services:
     depends_on:
       - management-api
     environment:
-      PORTAL_API_URL: http://localhost:8083/portal
+      PORTAL_API_URL: ${PORTAL_API_URL:-http://localhost:8083/portal}
     ports:
       - '4100:8080'
     networks:
@@ -249,7 +254,7 @@ services:
       SECRET_INTROSPECTION: ${SECRET_GRAVITEE_INTROSPECTION}
       LIMITE_DEBIT_PAR_MINUTE: ${LIMITE_DEBIT_PAR_MINUTE}
       QUOTA_PAR_JOUR: ${QUOTA_PAR_JOUR}
-      ORIGINE_SPA: http://localhost:4200
+      ORIGINE_SPA: ${ORIGINE_SPA:-http://localhost:4200}
     volumes:
       - ./infra/gravitee/amorcage:/amorcage
     depends_on:
