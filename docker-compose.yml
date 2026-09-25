@@ -40,8 +40,8 @@ services:
       KC_HTTP_ENABLED: 'true'
       KC_HEALTH_ENABLED: 'true'
       KC_METRICS_ENABLED: 'true'
-      # En formation derriere un reverse-proxy HTTPS : xforwarded (sinon laisser vide).
-      KC_PROXY_HEADERS: ${KC_PROXY_HEADERS:-}
+      # A definir dans .env (ex: xforwarded) derriere un reverse-proxy ; sinon laisser absent.
+      KC_PROXY_HEADERS:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_MOT_DE_PASSE_ADMIN}
       KC_LOG_LEVEL: info
