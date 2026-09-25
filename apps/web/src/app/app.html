@@ -1,0 +1,22 @@
+<header class="entete">
+  <div class="entete__marque">
+    <span class="entete__logo" aria-hidden="true">☕</span>
+    <p class="entete__titre">MyBrew</p>
+  </div>
+
+  <nav class="navigation">
+    <a routerLink="/" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }">
+      Catalogue
+    </a>
+    <a routerLink="/historique" routerLinkActive="actif">Historique</a>
+  </nav>
+</header>
+
+<main class="contenu">
+  <router-outlet />
+</main>
+
+<footer class="pied">
+  <span>Formation « Securiser et Manager son API »</span>
+  <span>API : <code>{{ configuration.urlApi }}</code></span>
+</footer>

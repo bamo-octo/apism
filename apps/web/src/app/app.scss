@@ -1,0 +1,76 @@
+/* Coquille de l'application : en-tête, contenu, pied de page. */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.entete {
+  align-items: center;
+  background: var(--cafe-fonce);
+  color: var(--creme);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding: 0.85rem 1.5rem;
+}
+
+.entete__marque {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.entete__logo {
+  font-size: 1.75rem;
+}
+
+.entete__titre {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.navigation {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+
+  a {
+    border-radius: 999px;
+    color: var(--creme-fonce);
+    padding: 0.35rem 0.85rem;
+    text-decoration: none;
+
+    &:hover {
+      background: rgb(255 255 255 / 8%);
+    }
+
+    &.actif {
+      background: var(--cafe);
+      color: var(--blanc);
+    }
+  }
+}
+
+.contenu {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 1040px;
+  padding: 0 1.5rem 3rem;
+  width: 100%;
+}
+
+.pied {
+  border-top: 1px solid var(--creme-fonce);
+  color: var(--texte-doux);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+}
