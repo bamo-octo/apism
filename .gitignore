@@ -12,3 +12,7 @@ infra/gravitee/amorcage/sortie/
 .vscode/
 .DS_Store
 *.log
+
+# IA
+AGENTS.md
+implem
