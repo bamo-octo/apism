@@ -1,0 +1,233 @@
+/* Styles partagés par toutes les pages de MyBrew. */
+
+:root {
+  --cafe-fonce: #2b1d16;
+  --cafe: #6f4e37;
+  --cafe-clair: #a9805f;
+  --creme: #f7f1e8;
+  --creme-fonce: #ebe0d2;
+  --blanc: #fffdfa;
+  --texte: #2b1d16;
+  --texte-doux: #6b5a50;
+  --succes: #2f7d5d;
+  --alerte: #b3401f;
+  --rayon: 12px;
+  --ombre: 0 1px 2px rgb(43 29 22 / 8%), 0 8px 24px rgb(43 29 22 / 6%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--creme);
+  color: var(--texte);
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+h2,
+h3 {
+  margin: 0 0 0.25rem;
+}
+
+code {
+  background: var(--creme-fonce);
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.85em;
+  padding: 0.1rem 0.3rem;
+}
+
+.entete-page {
+  margin: 2rem 0 1rem;
+}
+
+.sous-titre {
+  color: var(--texte-doux);
+  margin: 0;
+  max-width: 70ch;
+}
+
+.note {
+  background: var(--blanc);
+  border-left: 4px solid var(--cafe-clair);
+  border-radius: 0 var(--rayon) var(--rayon) 0;
+  color: var(--texte-doux);
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.attente {
+  color: var(--texte-doux);
+}
+
+/* --- Boutons --- */
+
+.bouton {
+  background: var(--blanc);
+  border: 1px solid var(--creme-fonce);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  cursor: pointer;
+  display: inline-block;
+  font: inherit;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  transition: background 120ms ease, transform 120ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--creme-fonce);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.bouton--principal {
+  background: var(--cafe);
+  border-color: var(--cafe);
+  color: var(--blanc);
+
+  &:hover:not(:disabled) {
+    background: var(--cafe-fonce);
+  }
+}
+
+.barre-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+/* --- Cartes --- */
+
+.grille-cartes {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.carte {
+  background: var(--blanc);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+
+  header {
+    align-items: baseline;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+}
+
+.carte__description {
+  color: var(--texte-doux);
+  margin: 0.5rem 0;
+}
+
+.carte__details {
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+.carte__actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+
+  label {
+    color: var(--texte-doux);
+    font-size: 0.9rem;
+  }
+
+  select {
+    border: 1px solid var(--creme-fonce);
+    border-radius: 6px;
+    font: inherit;
+    margin-left: 0.35rem;
+    padding: 0.3rem;
+  }
+}
+
+.etiquette {
+  background: var(--creme-fonce);
+  border-radius: 999px;
+  color: var(--cafe-fonce);
+  display: inline-block;
+  font-size: 0.8rem;
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* --- Alertes --- */
+
+.alerte {
+  background: #f6ded6;
+  border-left: 4px solid var(--alerte);
+  border-radius: 0 var(--rayon) var(--rayon) 0;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.alerte--succes {
+  background: #dff0e7;
+  border-left-color: var(--succes);
+}
+
+.alerte__titre {
+  font-weight: 600;
+  margin: 0;
+}
+
+.alerte__detail {
+  margin: 0.25rem 0 0;
+}
+
+/* --- Tableaux --- */
+
+.tableau {
+  background: var(--blanc);
+  border-collapse: collapse;
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  overflow: hidden;
+  width: 100%;
+
+  th,
+  td {
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+  }
+
+  thead th {
+    background: var(--creme-fonce);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  tbody tr:nth-child(even) {
+    background: #fdfaf5;
+  }
+}

@@ -1,0 +1,34 @@
+#   Navigateur ──> SPA MyBrew (nginx, :4200) ──> API MyBrew (NestJS, :3000)
+
+name: mybrew
+
+networks:
+  mybrew:
+    name: mybrew
+
+services:
+  api:
+    build:
+      context: ./apps/api
+    image: mybrew/api:formation
+    container_name: mybrew-api
+    environment:
+      PORT: '3000'
+    ports:
+      - '3000:3000'
+    networks:
+      - mybrew
+
+  web:
+    build:
+      context: ./apps/web
+    image: mybrew/web:formation
+    container_name: mybrew-web
+    environment:
+      WEB_URL_API: ${WEB_URL_API:-http://localhost:3000}
+    ports:
+      - '4200:80'
+    networks:
+      - mybrew
+    depends_on:
+      - api
