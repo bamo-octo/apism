@@ -11,6 +11,7 @@ export class PreparationsController {
   constructor(private readonly preparations: PreparationsService) {}
 
   @Post()
+  @UseGuards(CleApiGuard)
   preparer(
     @Body() demande: DemanderPreparationDto,
     @UtilisateurCourant() utilisateur: Utilisateur | undefined,
