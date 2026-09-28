@@ -8,7 +8,7 @@ export interface Boisson {
   doseLaitMl: number;
 }
 
-export const CATALOGUE: readonly Boisson[] = [
+export const CATALOGUE: Boisson[] = [
   {
     id: 'ristretto',
     libelle: 'Ristretto',

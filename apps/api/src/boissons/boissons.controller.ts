@@ -1,10 +1,45 @@
-import { Controller, Get } from '@nestjs/common';
-import { Boisson, CATALOGUE } from './boisson.js';
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { JetonGuard } from '../jetons/jeton.guard.js';
+import { type Boisson, CATALOGUE, trouverBoisson } from './boisson.js';
+import { BoissonDto } from './dto/boisson.dto.js';
 
 @Controller('boissons')
 export class BoissonsController {
   @Get()
   lister(): readonly Boisson[] {
     return CATALOGUE;
+  }
+
+  @Post()
+  ajouter(@Body() boisson: BoissonDto): Boisson {
+    if (trouverBoisson(boisson.id)) {
+      throw new ConflictException(`La boisson ${boisson.id} existe déjà.`);
+    }
+
+    CATALOGUE.push(boisson);
+    return boisson;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  supprimer(@Param('id') id: string): void {
+    const boisson = trouverBoisson(id);
+
+    if (!boisson) {
+      throw new NotFoundException(`Boisson inconnue : ${id}.`);
+    }
+
+    CATALOGUE.splice(CATALOGUE.indexOf(boisson), 1);
   }
 }

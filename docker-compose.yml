@@ -1,4 +1,5 @@
 #   Navigateur ──> SPA MyBrew (nginx, :4200) ──> API MyBrew (NestJS, :3000)
+#   Fournisseur ──> Keycloak (:18080) puis API MyBrew, avec un jeton d'accès
 
 name: mybrew
 
@@ -7,6 +8,29 @@ networks:
     name: mybrew
 
 services:
+  keycloak:
+    image: keycloak/keycloak:26.7
+    container_name: mybrew-keycloak
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      # URL de Keycloak vue depuis l'extérieur : c'est l'émetteur (`iss`) inscrit dans les jetons.
+      KC_HOSTNAME: ${KC_HOSTNAME:-http://localhost:18080}
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTP_ENABLED: 'true'
+      # Repris de l'environnement s'il est défini (ex : xforwarded derrière un reverse-proxy).
+      KC_PROXY_HEADERS:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    # Sans volume, le realm est réimporté à chaque recréation du conteneur.
+    volumes:
+      - ./infra/keycloak/realm-mybrew.json:/opt/keycloak/data/import/realm-mybrew.json:ro
+    ports:
+      - '18080:8080'
+    networks:
+      - mybrew
+
   api:
     build:
       context: ./apps/api
@@ -16,6 +40,9 @@ services:
       PORT: '3000'
       # Une clé par front autorisé, séparées par des virgules.
       CLES_API: 'cle-mybrew-web-b4b213eacc3e876c,cle-front-employes-6b8ca27f2f4caada'
+      # L'émetteur attendu est l'URL publique ; les clés publiques sont téléchargées via le réseau Docker.
+      KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
+      KEYCLOAK_URL_INTERNE: http://keycloak:8080
     ports:
       - '3000:3000'
     networks:

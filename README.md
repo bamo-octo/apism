@@ -20,6 +20,7 @@ make start      # ou : docker compose up -d --build
 | --- | --- |
 | SPA MyBrew | <http://localhost:4200> |
 | API MyBrew | <http://localhost:3000> |
+| Keycloak (admin / admin) | <http://localhost:18080> |
 
 ```bash
 make help       # liste tous les raccourcis
@@ -42,6 +43,7 @@ cd apps/web && npm install && npm run start        # SPA sur http://localhost:42
 ```
 apps/api/   API NestJS : catalogue, préparations
 apps/web/   SPA Angular (standalone, signals)
+infra/      Configuration de Keycloak (realm mybrew)
 TP/         Instructions du TP pour les participants
 ```
 

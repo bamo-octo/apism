@@ -1,0 +1,7 @@
+{
+  "realm": "mybrew",
+  "displayName": "MyBrew",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 300
+}

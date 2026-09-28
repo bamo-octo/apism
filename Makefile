@@ -11,11 +11,12 @@ install: ## Installe les dépendances pour l'autocomplétion dans l'IDE
 	cd apps/api && npm ci
 	cd apps/web && npm ci
 
-start: ## Démarre l'API et la SPA
+start: ## Démarre l'API, la SPA et Keycloak
 	docker compose up -d --build
 	@echo
 	@echo "SPA MyBrew .... http://localhost:4200"
 	@echo "API MyBrew .... http://localhost:3000"
+	@echo "Keycloak ...... http://localhost:18080 (admin / admin)"
 
 stop: ## Arrête la stack
 	docker compose stop
@@ -29,5 +30,5 @@ build: ## Reconstruit les images applicatives
 status: ## État des conteneurs
 	docker compose ps -a
 
-logs: ## Suit les logs de l'API et de la SPA
-	docker compose logs -f api web
+logs: ## Suit les logs de l'API, de la SPA et de Keycloak
+	docker compose logs -f api web keycloak
