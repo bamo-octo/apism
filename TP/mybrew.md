@@ -20,7 +20,7 @@ et la gestion d'API.
 ## Démarrer
 
 ```bash
-make demarrer
+make start
 ```
 
 - SPA : <http://localhost:4200>

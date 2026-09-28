@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import type { ErreurAffichable } from '../noyau/erreurs';
+import type { ErreurAffichable } from '../api/erreurs';
 
 /** Affiche une erreur d'API. */
 @Component({

@@ -13,7 +13,7 @@ autorisation et gestion d'API — voir [`TP/mybrew.md`](TP/mybrew.md).
 Prérequis : Docker Desktop (ou Docker Engine + Compose v2).
 
 ```bash
-make demarrer   # ou : docker compose up -d --build
+make start      # ou : docker compose up -d --build
 ```
 
 | Service | URL |
@@ -22,9 +22,9 @@ make demarrer   # ou : docker compose up -d --build
 | API MyBrew | <http://localhost:3000> |
 
 ```bash
-make aide       # liste tous les raccourcis
-make etat       # etat des conteneurs
-make nettoyer   # supprime tout, volumes compris
+make help       # liste tous les raccourcis
+make status     # état des conteneurs
+make clean      # supprime tout, volumes compris
 ```
 
 ### Sans Docker

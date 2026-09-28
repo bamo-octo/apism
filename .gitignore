@@ -4,6 +4,9 @@ dist/
 .angular/
 *.tsbuildinfo
 
+# Variables d'environnement locales
+.env
+
 # Sorties generees a l'execution
 infra/gravitee/amorcage/sortie/
 

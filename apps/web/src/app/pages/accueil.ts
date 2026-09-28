@@ -1,9 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { MessageErreur } from '../composants/message-erreur';
-import { decrireErreur, type ErreurAffichable } from '../noyau/erreurs';
-import type { Boisson, Preparation } from '../noyau/modeles';
-import { MyBrewApiService } from '../noyau/mybrew-api.service';
+import { decrireErreur, type ErreurAffichable } from '../api/erreurs';
+import type { Boisson, Preparation } from '../api/modeles';
+import { MyBrewApiService } from '../api/mybrew-api.service';
 
 /** Écran principal : le catalogue et le bouton qui coule le café. */
 @Component({
@@ -20,7 +20,7 @@ import { MyBrewApiService } from '../noyau/mybrew-api.service';
     @if (derniereBoisson(); as preparation) {
       <div class="alerte alerte--succes" role="status">
         <p class="alerte__titre">{{ preparation.libelleBoisson }} en cours de coulage</p>
-        <p class="alerte__detail">Servi a {{ preparation.horodatage | date: 'HH:mm:ss' }}.</p>
+        <p class="alerte__detail">Servi à {{ preparation.horodatage | date: 'HH:mm:ss' }}.</p>
       </div>
     }
 
@@ -33,7 +33,7 @@ import { MyBrewApiService } from '../noyau/mybrew-api.service';
         <article class="carte carte--boisson">
           <header>
             <h3>{{ boisson.libelle }}</h3>
-            <span class="etiquette" [title]="'Intensite ' + boisson.intensite + '/5'">
+            <span class="etiquette" [title]="'Intensité ' + boisson.intensite + '/5'">
               {{ intensite(boisson) }}
             </span>
           </header>

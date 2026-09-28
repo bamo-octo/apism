@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { CleApiGuard } from '../cles-api/cle-api.guard.js';
 import { UtilisateurCourant } from '../utilisateurs/utilisateur-courant.js';
 import type { Utilisateur } from '../utilisateurs/utilisateur.js';
 import { DemanderPreparationDto } from './dto/demander-preparation.dto.js';

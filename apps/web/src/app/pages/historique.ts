@@ -1,9 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { MessageErreur } from '../composants/message-erreur';
-import { decrireErreur, type ErreurAffichable } from '../noyau/erreurs';
-import type { Preparation } from '../noyau/modeles';
-import { MyBrewApiService } from '../noyau/mybrew-api.service';
+import { decrireErreur, type ErreurAffichable } from '../api/erreurs';
+import type { Preparation } from '../api/modeles';
+import { MyBrewApiService } from '../api/mybrew-api.service';
 
 @Component({
   selector: 'app-historique',
@@ -15,13 +15,13 @@ import { MyBrewApiService } from '../noyau/mybrew-api.service';
     </section>
 
     <div class="barre-actions">
-      <button type="button" class="bouton" (click)="rafraichir()">Rafraichir</button>
+      <button type="button" class="bouton" (click)="rafraichir()">Rafraîchir</button>
     </div>
 
     <app-message-erreur [erreur]="erreur()" />
 
     @if (preparations().length === 0) {
-      <p class="note">Aucune preparation pour l'instant. La journee peut encore commencer.</p>
+      <p class="note">Aucune préparation pour l'instant.</p>
     } @else {
       <table class="tableau">
         <thead>

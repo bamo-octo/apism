@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 
 async function demarrer(): Promise<void> {
-  const journal = new Logger('MyBrew');
+  const logger = new Logger('MyBrew');
   const application = await NestFactory.create(AppModule);
   const port = Number(process.env.PORT ?? 3000);
 
@@ -16,7 +16,7 @@ async function demarrer(): Promise<void> {
 
   await application.listen(port, '0.0.0.0');
 
-  journal.log(`API MyBrew a l'écoute sur le port ${port}`);
+  logger.log(`API MyBrew a l'écoute sur le port ${port}`);
 }
 
 await demarrer();

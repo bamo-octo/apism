@@ -34,9 +34,17 @@ export const decrireErreur = (erreur: unknown): ErreurAffichable => {
 
   if (erreur.status === 0) {
     return {
-      titre: 'Appel bloque',
-      detail: "Aucune reponse : verifiez l'URL de l'API dans configuration.json.",
+      titre: 'Appel bloqué',
+      detail: "Aucune réponse : vérifiez l'URL de l'API dans configuration.json.",
     };
+  }
+
+  if (erreur.status === 401) {
+    return { titre: 'Accès non autorisé', detail: detailDuCorps(erreur) };
+  }
+
+  if (erreur.status === 403) {
+    return { titre: 'Accès refusé', detail: detailDuCorps(erreur) };
   }
 
   return { titre: `Erreur ${erreur.status}`, detail: detailDuCorps(erreur) };

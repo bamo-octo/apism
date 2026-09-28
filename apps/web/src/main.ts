@@ -16,7 +16,7 @@ const chargerConfiguration = async (): Promise<ConfigurationApplication> => {
 
     return (await reponse.json()) as ConfigurationApplication;
   } catch (erreur) {
-    console.warn('configuration.json introuvable, utilisation des valeurs par defaut.', erreur);
+    console.warn('configuration.json introuvable, utilisation des valeurs par défaut.', erreur);
 
     return CONFIGURATION_PAR_DEFAUT;
   }
