@@ -22,6 +22,7 @@ export class BoissonsController {
   }
 
   @Post()
+  @UseGuards(JetonGuard)
   ajouter(@Body() boisson: BoissonDto): Boisson {
     if (trouverBoisson(boisson.id)) {
       throw new ConflictException(`La boisson ${boisson.id} existe déjà.`);
@@ -32,6 +33,7 @@ export class BoissonsController {
   }
 
   @Delete(':id')
+  @UseGuards(JetonGuard)
   @HttpCode(204)
   supprimer(@Param('id') id: string): void {
     const boisson = trouverBoisson(id);

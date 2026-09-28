@@ -3,5 +3,36 @@
   "displayName": "MyBrew",
   "enabled": true,
   "sslRequired": "none",
-  "accessTokenLifespan": 300
+  "accessTokenLifespan": 300,
+  "clients": [
+    {
+      "clientId": "mybrew-api",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    },
+    {
+      "clientId": "fournisseur",
+      "publicClient": false,
+      "secret": "secret-fournisseur-8aa3aee31f9a008f",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "audience-mybrew-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "mybrew-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ]
 }
