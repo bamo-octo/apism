@@ -12,7 +12,7 @@ export class PreparationsController {
   constructor(private readonly preparations: PreparationsService) {}
 
   @Post()
-  @UseGuards(CleApiGuard)
+  @UseGuards(CleApiGuard, JetonGuard)
   preparer(
     @Body() demande: DemanderPreparationDto,
     @UtilisateurCourant() utilisateur: Utilisateur | undefined,

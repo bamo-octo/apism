@@ -24,6 +24,8 @@ services:
       KC_PROXY_HEADERS:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Adresse de la SPA dans le navigateur, autorisée comme redirection du client `mybrew-web`.
+      ORIGINE_SPA: ${ORIGINE_SPA:-http://localhost:4200}
     # Sans volume, le realm est réimporté à chaque recréation du conteneur.
     volumes:
       - ./infra/keycloak/realm-mybrew.json:/opt/keycloak/data/import/realm-mybrew.json:ro

@@ -3,6 +3,6 @@
   "cleApi": "cle-mybrew-web-b4b213eacc3e876c",
   "keycloak": {
     "autorite": "${WEB_KEYCLOAK_AUTORITE}",
-    "clientId": ""
+    "clientId": "mybrew-web"
   }
 }

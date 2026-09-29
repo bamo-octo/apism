@@ -34,6 +34,43 @@
           }
         }
       ]
+    },
+    {
+      "clientId": "mybrew-web",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["${ORIGINE_SPA}/*"],
+      "webOrigins": ["${ORIGINE_SPA}"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-mybrew-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "mybrew-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "gerard",
+      "email": "gerard@mybrew.fr",
+      "emailVerified": true,
+      "firstName": "Gérard",
+      "lastName": "Dupont",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "gerard", "temporary": false }]
     }
   ]
 }
