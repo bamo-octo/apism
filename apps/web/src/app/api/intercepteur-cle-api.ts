@@ -2,11 +2,11 @@ import { type HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { CONFIGURATION_APPLICATION } from '../configuration/configuration-application';
 
-/** Ajoute la clé d'API aux appels lorsqu'elle est configurée. */
+/** Ajoute la clé d'API aux appels vers l'API lorsqu'elle est configurée. */
 export const intercepteurCleApi: HttpInterceptorFn = (requete, suivant) => {
-  const cleApi = inject(CONFIGURATION_APPLICATION).cleApi;
+  const { cleApi, urlApi } = inject(CONFIGURATION_APPLICATION);
 
-  if (!cleApi) {
+  if (!cleApi || !requete.url.startsWith(urlApi)) {
     return suivant(requete);
   }
 

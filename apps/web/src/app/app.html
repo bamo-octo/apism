@@ -10,6 +10,10 @@
     </a>
     <a routerLink="/historique" routerLinkActive="actif">Historique</a>
   </nav>
+
+  @if (session.connecte()) {
+    <button type="button" class="bouton" (click)="session.fermer()">Se déconnecter</button>
+  }
 </header>
 
 <main class="contenu">

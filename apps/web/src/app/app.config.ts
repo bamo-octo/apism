@@ -4,6 +4,10 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { intercepteurCleApi } from './api/intercepteur-cle-api';
 import { routes } from './app.routes';
 import {
+  fournirAuthentification,
+  intercepteursAuthentification,
+} from './authentification/authentification';
+import {
   CONFIGURATION_APPLICATION,
   type ConfigurationApplication,
 } from './configuration/configuration-application';
@@ -14,7 +18,10 @@ export const creerConfigurationApplication = (
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([intercepteurCleApi])),
+    provideHttpClient(
+      withInterceptors([intercepteurCleApi, ...intercepteursAuthentification(configuration)]),
+    ),
     { provide: CONFIGURATION_APPLICATION, useValue: configuration },
+    ...fournirAuthentification(configuration),
   ],
 });

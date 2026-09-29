@@ -4,6 +4,7 @@
   "enabled": true,
   "sslRequired": "none",
   "accessTokenLifespan": 300,
+  "accessCodeLifespan": 300,
   "clients": [
     {
       "clientId": "mybrew-api",

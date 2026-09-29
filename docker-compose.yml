@@ -1,4 +1,5 @@
 #   Navigateur ──> SPA MyBrew (nginx, :4200) ──> API MyBrew (NestJS, :3000)
+#   Navigateur ──> Keycloak (:18080) pour la connexion des utilisateurs
 #   Fournisseur ──> Keycloak (:18080) puis API MyBrew, avec un jeton d'accès
 
 name: mybrew
@@ -55,6 +56,7 @@ services:
     container_name: mybrew-web
     environment:
       WEB_URL_API: ${API_URL_DIRECTE:-http://localhost:3000}
+      WEB_KEYCLOAK_AUTORITE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}/realms/mybrew
     ports:
       - '4200:80'
     networks:
