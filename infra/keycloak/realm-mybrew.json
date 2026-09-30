@@ -5,6 +5,11 @@
   "sslRequired": "none",
   "accessTokenLifespan": 300,
   "accessCodeLifespan": 300,
+  "roles": {
+    "client": {
+      "mybrew-api": [{ "name": "couler-cafe-mystere" }]
+    }
+  },
   "clients": [
     {
       "clientId": "mybrew-api",
@@ -103,7 +108,8 @@
       "firstName": "Sara",
       "lastName": "Martin",
       "enabled": true,
-      "credentials": [{ "type": "password", "value": "sara", "temporary": false }]
+      "credentials": [{ "type": "password", "value": "sara", "temporary": false }],
+      "clientRoles": { "mybrew-api": ["couler-cafe-mystere"] }
     }
   ]
 }

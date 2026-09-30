@@ -19,8 +19,9 @@ import { BoissonDto } from './dto/boisson.dto.js';
 @Controller('boissons')
 export class BoissonsController {
   @Get()
-  lister(): readonly Boisson[] {
-    return CATALOGUE;
+  @UseGuards(JetonGuard)
+  lister(@UtilisateurCourant() utilisateur: Utilisateur | undefined): readonly Boisson[] {
+    return CATALOGUE.filter((boisson) => peutCommander(utilisateur, boisson));
   }
 
   @Post()
