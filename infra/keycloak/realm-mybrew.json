@@ -46,7 +46,8 @@
       "webOrigins": ["${ORIGINE_SPA}"],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "+"
+        "post.logout.redirect.uris": "+",
+        "access.token.lifespan": "60"
       },
       "protocolMappers": [
         {

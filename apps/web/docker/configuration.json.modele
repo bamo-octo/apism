@@ -4,6 +4,6 @@
   "keycloak": {
     "autorite": "${WEB_KEYCLOAK_AUTORITE}",
     "clientId": "mybrew-web",
-    "renouvellementAutomatique": false
+    "renouvellementAutomatique": true
   }
 }
