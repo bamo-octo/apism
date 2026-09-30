@@ -3,6 +3,7 @@
   "cleApi": "",
   "keycloak": {
     "autorite": "http://localhost:18080/realms/mybrew",
-    "clientId": ""
+    "clientId": "",
+    "renouvellementAutomatique": false
   }
 }

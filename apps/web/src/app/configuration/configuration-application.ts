@@ -6,6 +6,7 @@ export interface ConfigurationApplication {
   keycloak: {
     autorite: string;
     clientId?: string;
+    renouvellementAutomatique?: boolean;
   };
 }
 

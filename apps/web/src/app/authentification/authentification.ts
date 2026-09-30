@@ -6,13 +6,18 @@ import type { ConfigurationApplication } from '../configuration/configuration-ap
 export const authentificationActivee = (configuration: ConfigurationApplication): boolean =>
   Boolean(configuration.keycloak.clientId);
 
-/** Connexion à Keycloak avec le flow authorization code + PKCE, si un client est configuré. */
+/**
+ * Connexion à Keycloak avec le flow authorization code + PKCE, si un client est configuré.
+ * Avec `renouvellementAutomatique`, le jeton d'accès est renouvelé avant expiration grâce au refresh token.
+ */
 export const fournirAuthentification = (
   configuration: ConfigurationApplication,
 ): EnvironmentProviders[] => {
   if (!authentificationActivee(configuration)) {
     return [];
   }
+
+  const renouvellement = configuration.keycloak.renouvellementAutomatique ?? false;
 
   return [
     provideAuth({
@@ -24,6 +29,10 @@ export const fournirAuthentification = (
         redirectUrl: window.location.origin,
         postLogoutRedirectUri: window.location.origin,
         secureRoutes: [configuration.urlApi],
+        silentRenew: renouvellement,
+        useRefreshToken: renouvellement,
+        renewTimeBeforeTokenExpiresInSeconds: 30,
+        ignoreNonceAfterRefresh: true,
       },
     }),
   ];
