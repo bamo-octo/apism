@@ -41,10 +41,11 @@ cd apps/web && npm install && npm run start        # SPA sur http://localhost:42
 ## Ce qu'il y a dans le dépôt
 
 ```
-apps/api/   API NestJS : catalogue, préparations
-apps/web/   SPA Angular (standalone, signals)
-infra/      Configuration de Keycloak (realm mybrew)
-TP/         Instructions du TP pour les participants
+apps/api/        API NestJS : catalogue, préparations
+apps/web/        SPA Angular (standalone, signals)
+apps/ascenseur/  Interface de commande de l'ascenseur (CLI)
+infra/           Configuration de Keycloak (realm mybrew)
+TP/              Instructions du TP pour les participants
 ```
 
 Aucune base de données : le catalogue est en dur et l'historique des

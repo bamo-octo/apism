@@ -1,7 +1,7 @@
 # Raccourcis du TP « Sécuriser et Manager son API ».
 
 .DEFAULT_GOAL := help
-.PHONY: help install start stop clean build logs status
+.PHONY: help install start stop clean build logs status ascenseur
 
 help: ## Affiche cette aide
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -32,3 +32,6 @@ status: ## État des conteneurs
 
 logs: ## Suit les logs de l'API, de la SPA et de Keycloak
 	docker compose logs -f api web keycloak
+
+ascenseur: ## Lance l'interface de l'ascenseur
+	docker compose run --rm ascenseur

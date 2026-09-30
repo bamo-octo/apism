@@ -1,6 +1,7 @@
 #   Navigateur ──> SPA MyBrew (nginx, :4200) ──> API MyBrew (NestJS, :3000)
 #   Navigateur ──> Keycloak (:18080) pour la connexion des utilisateurs
 #   Fournisseur ──> Keycloak (:18080) puis API MyBrew, avec un jeton d'accès
+#   Ascenseur ──> Keycloak (:18080) puis API MyBrew, pour le compte d'un utilisateur
 
 name: mybrew
 
@@ -42,7 +43,7 @@ services:
     environment:
       PORT: '3000'
       # Une clé par front autorisé, séparées par des virgules.
-      CLES_API: 'cle-mybrew-web-b4b213eacc3e876c,cle-front-employes-6b8ca27f2f4caada'
+      CLES_API: 'cle-mybrew-web-b4b213eacc3e876c,cle-front-employes-6b8ca27f2f4caada,cle-ascenseur-17c912ea672e5b69'
       # L'émetteur attendu est l'URL publique ; les clés publiques sont téléchargées via le réseau Docker.
       KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
       KEYCLOAK_URL_INTERNE: http://keycloak:8080
@@ -61,6 +62,26 @@ services:
       WEB_KEYCLOAK_AUTORITE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}/realms/mybrew
     ports:
       - '4200:80'
+    networks:
+      - mybrew
+    depends_on:
+      - api
+
+  # Interface de l'ascenseur, lancée à la demande avec `make ascenseur`.
+  ascenseur:
+    image: node:24-alpine
+    profiles:
+      - outils
+    working_dir: /ascenseur
+    command: node ascenseur.mjs
+    volumes:
+      - ./apps/ascenseur:/ascenseur:ro
+    environment:
+      ASCENSEUR_URL_API: http://api:3000
+      ASCENSEUR_CLE_API: cle-ascenseur-17c912ea672e5b69
+      ASCENSEUR_KEYCLOAK_AUTORITE: http://keycloak:8080/realms/mybrew
+      # Vide : l'ascenseur commande sans identifier l'utilisateur.
+      ASCENSEUR_CLIENT_ID: ''
     networks:
       - mybrew
     depends_on:
