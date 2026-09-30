@@ -1,3 +1,5 @@
+import type { Utilisateur } from '../utilisateurs/utilisateur.js';
+
 export interface Boisson {
   id: string;
   libelle: string;
@@ -6,6 +8,7 @@ export interface Boisson {
   doseEauMl: number;
   doseGrainsG: number;
   doseLaitMl: number;
+  permission?: string;
 }
 
 export const CATALOGUE: Boisson[] = [
@@ -63,7 +66,21 @@ export const CATALOGUE: Boisson[] = [
     doseGrainsG: 0,
     doseLaitMl: 150,
   },
+  {
+    id: 'cafe-mystere',
+    libelle: 'Café mystère',
+    description: "Rapporté de voyage par la direction. Personne ne sait ce qu'il contient.",
+    intensite: 5,
+    doseEauMl: 30,
+    doseGrainsG: 9,
+    doseLaitMl: 0,
+    permission: 'couler-cafe-mystere',
+  },
 ];
 
 export const trouverBoisson = (id: string): Boisson | undefined =>
   CATALOGUE.find((boisson) => boisson.id === id);
+
+/** Une boisson sans permission est ouverte à tous ; sinon, l'utilisateur doit avoir la permission. */
+export const peutCommander = (utilisateur: Utilisateur | undefined, boisson: Boisson): boolean =>
+  !boisson.permission || (utilisateur?.permissions.includes(boisson.permission) ?? false);

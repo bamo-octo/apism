@@ -11,7 +11,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JetonGuard } from '../jetons/jeton.guard.js';
-import { type Boisson, CATALOGUE, trouverBoisson } from './boisson.js';
+import { UtilisateurCourant } from '../utilisateurs/utilisateur-courant.js';
+import type { Utilisateur } from '../utilisateurs/utilisateur.js';
+import { type Boisson, CATALOGUE, peutCommander, trouverBoisson } from './boisson.js';
 import { BoissonDto } from './dto/boisson.dto.js';
 
 @Controller('boissons')

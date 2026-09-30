@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { firstValueFrom } from 'rxjs';
 import { CONFIGURATION_APPLICATION } from '../configuration/configuration-application';
 import { authentificationActivee } from './authentification';
 
@@ -12,14 +13,17 @@ export class SessionService {
   readonly connecte = signal(false);
 
   /** Redirige vers la page de connexion si l'utilisateur n'est pas encore connecté. */
-  ouvrir(): void {
-    this.oidc?.checkAuth().subscribe(({ isAuthenticated }) => {
-      this.connecte.set(isAuthenticated);
+  async ouvrir(): Promise<void> {
+    if (!this.oidc) {
+      return;
+    }
 
-      if (!isAuthenticated) {
-        this.oidc?.authorize();
-      }
-    });
+    const { isAuthenticated } = await firstValueFrom(this.oidc.checkAuth());
+    this.connecte.set(isAuthenticated);
+
+    if (!isAuthenticated) {
+      this.oidc.authorize();
+    }
   }
 
   fermer(): void {

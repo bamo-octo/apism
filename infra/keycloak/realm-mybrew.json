@@ -95,6 +95,15 @@
       "lastName": "Dupont",
       "enabled": true,
       "credentials": [{ "type": "password", "value": "gerard", "temporary": false }]
+    },
+    {
+      "username": "sara",
+      "email": "sara@mybrew.fr",
+      "emailVerified": true,
+      "firstName": "Sara",
+      "lastName": "Martin",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "sara", "temporary": false }]
     }
   ]
 }

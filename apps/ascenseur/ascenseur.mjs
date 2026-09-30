@@ -46,9 +46,16 @@ async function seConnecter() {
   }
 }
 
-const reponseBoissons = await fetch(`${ASCENSEUR_URL_API}/boissons`).catch(() =>
+const messages = { 401: 'Accès non autorisé.', 403: 'Accès impossible.' };
+const jeton = ASCENSEUR_CLIENT_ID ? await seConnecter() : undefined;
+const autorisation = jeton ? { Authorization: `Bearer ${jeton}` } : {};
+
+const reponseBoissons = await fetch(`${ASCENSEUR_URL_API}/boissons`, { headers: autorisation }).catch(() =>
   abandonner('Machine à café indisponible, réessayez dans quelques instants.'),
 );
+if (!reponseBoissons.ok) {
+  abandonner(messages[reponseBoissons.status] ?? 'Catalogue indisponible.');
+}
 const boissons = await reponseBoissons.json();
 boissons.forEach((boisson, index) => console.log(`${index + 1}. ${boisson.libelle}`));
 
@@ -60,17 +67,10 @@ if (!boisson) {
   abandonner('Boisson inconnue.');
 }
 
-const jeton = ASCENSEUR_CLIENT_ID ? await seConnecter() : undefined;
-
 const reponse = await fetch(`${ASCENSEUR_URL_API}/preparations`, {
   method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': ASCENSEUR_CLE_API,
-    ...(jeton && { Authorization: `Bearer ${jeton}` }),
-  },
+  headers: { 'Content-Type': 'application/json', 'x-api-key': ASCENSEUR_CLE_API, ...autorisation },
   body: JSON.stringify({ idBoisson: boisson.id }),
 });
 
-const messages = { 401: 'Accès non autorisé.', 403: 'Accès impossible.' };
 console.log(reponse.ok ? `Votre ${boisson.libelle} vous attend à la machine.` : (messages[reponse.status] ?? 'La commande a échoué.'));

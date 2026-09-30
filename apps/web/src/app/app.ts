@@ -12,8 +12,4 @@ import { CONFIGURATION_APPLICATION } from './configuration/configuration-applica
 export class App {
   protected readonly configuration = inject(CONFIGURATION_APPLICATION);
   protected readonly session = inject(SessionService);
-
-  constructor() {
-    this.session.ouvrir();
-  }
 }

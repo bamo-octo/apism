@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { trouverBoisson } from '../boissons/boisson.js';
+import { peutCommander, trouverBoisson } from '../boissons/boisson.js';
 import type { Utilisateur } from '../utilisateurs/utilisateur.js';
 import type { DemanderPreparationDto } from './dto/demander-preparation.dto.js';
 import type { Preparation } from './preparation.js';
