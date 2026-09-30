@@ -81,7 +81,7 @@ services:
       ASCENSEUR_CLE_API: cle-ascenseur-17c912ea672e5b69
       ASCENSEUR_KEYCLOAK_AUTORITE: http://keycloak:8080/realms/mybrew
       # Vide : l'ascenseur commande sans identifier l'utilisateur.
-      ASCENSEUR_CLIENT_ID: ''
+      ASCENSEUR_CLIENT_ID: 'ascenseur'
     networks:
       - mybrew
     depends_on:
