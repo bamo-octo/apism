@@ -1,7 +1,11 @@
 import type { HttpInterceptorFn } from '@angular/common/http';
-import type { EnvironmentProviders } from '@angular/core';
-import { authInterceptor, provideAuth } from 'angular-auth-oidc-client';
-import type { ConfigurationApplication } from '../configuration/configuration-application';
+import { type EnvironmentProviders, inject } from '@angular/core';
+import { OidcSecurityService, provideAuth } from 'angular-auth-oidc-client';
+import { switchMap } from 'rxjs';
+import {
+  CONFIGURATION_APPLICATION,
+  type ConfigurationApplication,
+} from '../configuration/configuration-application';
 
 export const authentificationActivee = (configuration: ConfigurationApplication): boolean =>
   Boolean(configuration.keycloak.clientId);
@@ -24,11 +28,12 @@ export const fournirAuthentification = (
       config: {
         authority: configuration.keycloak.autorite,
         clientId: configuration.keycloak.clientId,
-        scope: 'openid',
+        scope: configuration.keycloak.scope ?? 'openid',
         responseType: 'code',
+        // L'identité de l'utilisateur est lue dans l'ID token.
+        autoUserInfo: false,
         redirectUrl: window.location.origin,
         postLogoutRedirectUri: window.location.origin,
-        secureRoutes: [configuration.urlApi],
         silentRenew: renouvellement,
         useRefreshToken: renouvellement,
         renewTimeBeforeTokenExpiresInSeconds: 30,
@@ -38,7 +43,24 @@ export const fournirAuthentification = (
   ];
 };
 
-/** Ajoute le jeton d'accès aux appels vers l'API lorsque l'utilisateur est connecté. */
+/** Ajoute le jeton aux appels vers l'API : le jeton d'accès, ou l'ID token avec `jetonPourApi: "id"`. */
+const intercepteurJeton: HttpInterceptorFn = (requete, suivant) => {
+  const { keycloak, urlApi } = inject(CONFIGURATION_APPLICATION);
+  const oidc = inject(OidcSecurityService);
+
+  if (!requete.url.startsWith(urlApi)) {
+    return suivant(requete);
+  }
+
+  const jeton$ = keycloak.jetonPourApi === 'id' ? oidc.getIdToken() : oidc.getAccessToken();
+
+  return jeton$.pipe(
+    switchMap((jeton) =>
+      suivant(jeton ? requete.clone({ setHeaders: { Authorization: `Bearer ${jeton}` } }) : requete),
+    ),
+  );
+};
+
 export const intercepteursAuthentification = (
   configuration: ConfigurationApplication,
-): HttpInterceptorFn[] => (authentificationActivee(configuration) ? [authInterceptor()] : []);
+): HttpInterceptorFn[] => (authentificationActivee(configuration) ? [intercepteurJeton] : []);

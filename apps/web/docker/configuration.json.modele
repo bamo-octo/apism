@@ -4,6 +4,8 @@
   "keycloak": {
     "autorite": "${WEB_KEYCLOAK_AUTORITE}",
     "clientId": "mybrew-web",
+    "scope": "openid",
+    "jetonPourApi": "acces",
     "renouvellementAutomatique": true
   }
 }

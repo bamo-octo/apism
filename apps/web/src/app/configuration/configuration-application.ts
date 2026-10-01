@@ -6,6 +6,8 @@ export interface ConfigurationApplication {
   keycloak: {
     autorite: string;
     clientId?: string;
+    scope?: string;
+    jetonPourApi?: 'acces' | 'id';
     renouvellementAutomatique?: boolean;
   };
 }

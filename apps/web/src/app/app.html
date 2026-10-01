@@ -11,7 +11,12 @@
     <a routerLink="/historique" routerLinkActive="actif">Historique</a>
   </nav>
 
+  @if (session.erreurConnexion(); as erreur) {
+    <span>Connexion impossible : {{ erreur }}</span>
+  }
+
   @if (session.connecte()) {
+    <span>Bienvenue {{ session.utilisateur()?.given_name }} {{ session.utilisateur()?.family_name }} !</span>
     <button type="button" class="bouton" (click)="session.fermer()">Se déconnecter</button>
   }
 </header>

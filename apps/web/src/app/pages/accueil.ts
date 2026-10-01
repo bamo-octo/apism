@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MessageErreur } from '../composants/message-erreur';
 import { decrireErreur, type ErreurAffichable } from '../api/erreurs';
 import type { Boisson, Preparation } from '../api/modeles';
 import { MyBrewApiService } from '../api/mybrew-api.service';
+import { SessionService } from '../authentification/session.service';
 
 /** Écran principal : le catalogue et le bouton qui coule le café. */
 @Component({
@@ -30,9 +31,12 @@ import { MyBrewApiService } from '../api/mybrew-api.service';
 
     <div class="grille-cartes">
       @for (boisson of boissons(); track boisson.id) {
-        <article class="carte carte--boisson">
+        <article class="carte carte--boisson" [class.carte--preferee]="boisson.id === preferee()">
           <header>
             <h3>{{ boisson.libelle }}</h3>
+            @if (boisson.id === preferee()) {
+              <span class="etiquette etiquette--preferee">Votre préférée</span>
+            }
             <span class="etiquette" [title]="'Intensité ' + boisson.intensite + '/5'">
               {{ intensite(boisson) }}
             </span>
@@ -69,6 +73,9 @@ import { MyBrewApiService } from '../api/mybrew-api.service';
 })
 export class Accueil {
   private readonly api = inject(MyBrewApiService);
+  private readonly session = inject(SessionService);
+
+  protected readonly preferee = computed(() => this.session.utilisateur()?.boisson_preferee);
 
   protected readonly boissons = signal<Boisson[]>([]);
   protected readonly erreur = signal<ErreurAffichable | null>(null);

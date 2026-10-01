@@ -4,6 +4,13 @@ import { firstValueFrom } from 'rxjs';
 import { CONFIGURATION_APPLICATION } from '../configuration/configuration-application';
 import { authentificationActivee } from './authentification';
 
+/** Claims de l'ID token utilisés pour présenter l'utilisateur. */
+export interface IdentiteUtilisateur {
+  given_name?: string;
+  family_name?: string;
+  boisson_preferee?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private readonly oidc = authentificationActivee(inject(CONFIGURATION_APPLICATION))
@@ -11,17 +18,20 @@ export class SessionService {
     : null;
 
   readonly connecte = signal(false);
+  readonly utilisateur = signal<IdentiteUtilisateur | null>(null);
+  readonly erreurConnexion = signal(new URLSearchParams(window.location.search).get('error_description'));
 
-  /** Redirige vers la page de connexion si l'utilisateur n'est pas encore connecté. */
+  /** Redirige vers la page de connexion si l'utilisateur n'est pas encore connecté et que Keycloak n'a pas renvoyé d'erreur. */
   async ouvrir(): Promise<void> {
     if (!this.oidc) {
       return;
     }
 
-    const { isAuthenticated } = await firstValueFrom(this.oidc.checkAuth());
+    const { isAuthenticated, userData } = await firstValueFrom(this.oidc.checkAuth());
     this.connecte.set(isAuthenticated);
+    this.utilisateur.set(userData as IdentiteUtilisateur | null);
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !this.erreurConnexion()) {
       this.oidc.authorize();
     }
   }

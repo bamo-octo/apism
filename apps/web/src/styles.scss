@@ -180,6 +180,15 @@ code {
   white-space: nowrap;
 }
 
+.carte--preferee {
+  outline: 2px solid var(--cafe-clair);
+}
+
+.etiquette--preferee {
+  background: var(--cafe);
+  color: var(--blanc);
+}
+
 /* --- Alertes --- */
 
 .alerte {
