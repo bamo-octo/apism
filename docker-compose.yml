@@ -5,6 +5,7 @@
 #   API MyBrew ──> Catalogue (:3001, joignable uniquement sur le réseau Docker)
 #   Navigateur ──> Gateway Gravitee (:8082) ──> API MyBrew
 #   Navigateur ──> Console Gravitee (:8084) ──> API de management Gravitee (:8083)
+#   Gateway Gravitee ──> Elasticsearch (métriques des requêtes) <── API de management Gravitee
 
 name: mybrew
 
@@ -14,6 +15,7 @@ networks:
 
 volumes:
   donnees-mongo:
+  donnees-elasticsearch:
 
 services:
   keycloak:
@@ -128,13 +130,33 @@ services:
     networks:
       - mybrew
 
+  # Stockage des métriques de la gateway, lues par la console Gravitee.
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
+    container_name: mybrew-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    volumes:
+      - donnees-elasticsearch:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fs "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s"']
+      interval: 5s
+      timeout: 10s
+      retries: 30
+    networks:
+      - mybrew
+
   gateway:
     image: graviteeio/apim-gateway:4.12.19
     container_name: mybrew-gateway
     environment:
       gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee
       gravitee_ratelimit_mongodb_uri: mongodb://mongodb:27017/gravitee
+      # À 'true', la gateway envoie à Elasticsearch une métrique par requête.
       gravitee_reporters_elasticsearch_enabled: 'false'
+      gravitee_reporters_elasticsearch_endpoints_0: http://elasticsearch:9200
       # Les API déployées depuis la console sont prises en compte en 2 secondes.
       gravitee_services_sync_delay: '2000'
     ports:
@@ -144,13 +166,15 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
 
   management-api:
     image: graviteeio/apim-management-api:4.12.19
     container_name: mybrew-management-api
     environment:
       gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee
-      gravitee_analytics_type: none
+      gravitee_analytics_elasticsearch_endpoints_0: http://elasticsearch:9200
       gravitee_console_url: ${GRAVITEE_CONSOLE_URL:-http://localhost:8084}
     ports:
       - '8083:8083'
@@ -158,6 +182,8 @@ services:
       - mybrew
     depends_on:
       mongodb:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
 
   console:
