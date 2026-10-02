@@ -47,7 +47,30 @@
           "clientIdClaim": "azp",
           "propagateAuthHeader": true
         }
-      }
+      },
+      "flows": [
+        {
+          "name": "Quota de café",
+          "enabled": true,
+          "selectors": [{ "type": "HTTP", "path": "/preparations", "pathOperator": "EQUALS", "methods": ["POST"] }],
+          "request": [
+            {
+              "name": "Quota",
+              "enabled": true,
+              "policy": "quota",
+              "configuration": {
+                "addHeaders": true,
+                "quota": {
+                  "key": "{#context.attributes['user']}",
+                  "limit": 3,
+                  "periodTime": 1,
+                  "periodTimeUnit": "DAYS"
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
