@@ -4,6 +4,8 @@
     "type": "PROXY",
     "name": "MyBrew",
     "apiVersion": "1.0",
+    "visibility": "PUBLIC",
+    "lifecycleState": "PUBLISHED",
     "listeners": [
       {
         "type": "HTTP",
@@ -79,6 +81,14 @@
           ]
         }
       ]
+    },
+    {
+      "definitionVersion": "V4",
+      "name": "Écran",
+      "mode": "STANDARD",
+      "status": "PUBLISHED",
+      "validation": "AUTO",
+      "security": { "type": "API_KEY" }
     }
   ]
 }
