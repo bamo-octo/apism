@@ -50,9 +50,9 @@ services:
       KEYCLOAK_URL_INTERNE: http://keycloak:8080
       CATALOGUE_URL: http://catalogue:3001
       # Jeton envoyé au catalogue : vide (aucun), `transmettre` (le jeton reçu) ou `echanger` (token exchange).
-      CATALOGUE_JETON: ''
+      CATALOGUE_JETON: 'echanger'
       # Secret du client `mybrew-api`, nécessaire pour échanger un jeton.
-      KEYCLOAK_CLIENT_SECRET: ''
+      KEYCLOAK_CLIENT_SECRET: 'secret-mybrew-api-3f6b1c9e27d4a805'
     ports:
       - '3000:3000'
     networks:
@@ -68,7 +68,7 @@ services:
     environment:
       PORT: '3001'
       # À 'true', le catalogue exige un jeton d'accès dont l'audience est `catalogue`.
-      CATALOGUE_JETON_OBLIGATOIRE: 'false'
+      CATALOGUE_JETON_OBLIGATOIRE: 'true'
       KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
       KEYCLOAK_URL_INTERNE: http://keycloak:8080
     networks:
