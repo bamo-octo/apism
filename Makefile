@@ -12,12 +12,14 @@ install: ## Installe les dépendances pour l'autocomplétion dans l'IDE
 	cd apps/catalogue && npm ci
 	cd apps/web && npm ci
 
-start: ## Démarre l'API, le catalogue, la SPA et Keycloak
+start: ## Démarre l'API, le catalogue, la SPA, Keycloak et Gravitee
 	docker compose up -d --build
 	@echo
-	@echo "SPA MyBrew .... http://localhost:4200"
-	@echo "API MyBrew .... http://localhost:3000"
-	@echo "Keycloak ...... http://localhost:18080 (admin / admin)"
+	@echo "SPA MyBrew ......... http://localhost:4200"
+	@echo "API MyBrew ......... http://localhost:3000"
+	@echo "Keycloak ........... http://localhost:18080 (admin / admin)"
+	@echo "Gateway Gravitee ... http://localhost:8082"
+	@echo "Console Gravitee ... http://localhost:8084 (admin / admin)"
 
 stop: ## Arrête la stack
 	docker compose stop
@@ -31,8 +33,8 @@ build: ## Reconstruit les images applicatives
 status: ## État des conteneurs
 	docker compose ps -a
 
-logs: ## Suit les logs de l'API, du catalogue, de la SPA et de Keycloak
-	docker compose logs -f api catalogue web keycloak
+logs: ## Suit les logs de l'API, du catalogue, de la SPA, de Keycloak et de la gateway
+	docker compose logs -f api catalogue web keycloak gateway
 
 ascenseur: ## Lance l'interface de l'ascenseur
 	docker compose run --rm ascenseur

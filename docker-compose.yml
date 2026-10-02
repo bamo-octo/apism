@@ -3,12 +3,17 @@
 #   Fournisseur ──> Keycloak (:18080) puis API MyBrew, avec un jeton d'accès
 #   Ascenseur ──> Keycloak (:18080) puis API MyBrew, pour le compte d'un utilisateur
 #   API MyBrew ──> Catalogue (:3001, joignable uniquement sur le réseau Docker)
+#   Navigateur ──> Gateway Gravitee (:8082) ──> API MyBrew
+#   Navigateur ──> Console Gravitee (:8084) ──> API de management Gravitee (:8083)
 
 name: mybrew
 
 networks:
   mybrew:
     name: mybrew
+
+volumes:
+  donnees-mongo:
 
 services:
   keycloak:
@@ -108,3 +113,61 @@ services:
       - mybrew
     depends_on:
       - api
+
+  # Stockage de la configuration de Gravitee (API, plans, applications).
+  mongodb:
+    image: mongo:7
+    container_name: mybrew-mongodb
+    volumes:
+      - donnees-mongo:/data/db
+    healthcheck:
+      test: ['CMD-SHELL', 'mongosh --quiet --eval "db.runCommand({ ping: 1 }).ok" | grep -q 1']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - mybrew
+
+  gateway:
+    image: graviteeio/apim-gateway:4.12.19
+    container_name: mybrew-gateway
+    environment:
+      gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee
+      gravitee_ratelimit_mongodb_uri: mongodb://mongodb:27017/gravitee
+      gravitee_reporters_elasticsearch_enabled: 'false'
+      # Les API déployées depuis la console sont prises en compte en 2 secondes.
+      gravitee_services_sync_delay: '2000'
+    ports:
+      - '8082:8082'
+    networks:
+      - mybrew
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  management-api:
+    image: graviteeio/apim-management-api:4.12.19
+    container_name: mybrew-management-api
+    environment:
+      gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee
+      gravitee_analytics_type: none
+      gravitee_console_url: ${GRAVITEE_CONSOLE_URL:-http://localhost:8084}
+    ports:
+      - '8083:8083'
+    networks:
+      - mybrew
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  console:
+    image: graviteeio/apim-management-ui:4.12.19
+    container_name: mybrew-console
+    environment:
+      MGMT_API_URL: ${MGMT_API_URL:-http://localhost:8083/management/}
+    ports:
+      - '8084:8080'
+    networks:
+      - mybrew
+    depends_on:
+      - management-api
