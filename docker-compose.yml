@@ -85,7 +85,7 @@ services:
     image: mybrew/web:formation
     container_name: mybrew-web
     environment:
-      WEB_URL_API: ${API_URL_DIRECTE:-http://localhost:3000}
+      WEB_URL_API: ${API_URL_GATEWAY:-http://localhost:8082/mybrew}
       WEB_KEYCLOAK_AUTORITE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}/realms/mybrew
     ports:
       - '4200:80'
@@ -171,3 +171,21 @@ services:
       - mybrew
     depends_on:
       - management-api
+
+  # Importe l'API MyBrew dans Gravitee au premier démarrage, puis s'arrête.
+  gravitee-import:
+    image: node:24-alpine
+    container_name: mybrew-gravitee-import
+    working_dir: /gravitee
+    command: node importer.mjs
+    volumes:
+      - ./infra/gravitee:/gravitee:ro
+    environment:
+      URL_MANAGEMENT_API: http://management-api:8083
+      # Adresse de la SPA dans le navigateur, autorisée par le CORS de la gateway.
+      ORIGINE_SPA: ${ORIGINE_SPA:-http://localhost:4200}
+    networks:
+      - mybrew
+    depends_on:
+      - management-api
+    restart: 'no'

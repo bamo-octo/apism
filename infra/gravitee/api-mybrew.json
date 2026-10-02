@@ -1,0 +1,53 @@
+{
+  "api": {
+    "definitionVersion": "V4",
+    "type": "PROXY",
+    "name": "MyBrew",
+    "apiVersion": "1.0",
+    "listeners": [
+      {
+        "type": "HTTP",
+        "paths": [{ "path": "/mybrew" }],
+        "entrypoints": [{ "type": "http-proxy" }],
+        "cors": {
+          "enabled": true,
+          "allowOrigin": ["${ORIGINE_SPA}"],
+          "allowMethods": ["GET", "POST", "DELETE"],
+          "allowHeaders": ["authorization", "content-type", "x-api-key"]
+        }
+      }
+    ],
+    "endpointGroups": [
+      {
+        "name": "Default HTTP proxy group",
+        "type": "http-proxy",
+        "endpoints": [
+          {
+            "name": "API MyBrew",
+            "type": "http-proxy",
+            "configuration": { "target": "http://api:3000" }
+          }
+        ]
+      }
+    ]
+  },
+  "plans": [
+    {
+      "definitionVersion": "V4",
+      "name": "Jeton Keycloak",
+      "mode": "STANDARD",
+      "status": "PUBLISHED",
+      "validation": "AUTO",
+      "security": {
+        "type": "JWT",
+        "configuration": {
+          "signature": "RSA_RS256",
+          "publicKeyResolver": "JWKS_URL",
+          "resolverParameter": "http://keycloak:8080/realms/mybrew/protocol/openid-connect/certs",
+          "clientIdClaim": "azp",
+          "propagateAuthHeader": true
+        }
+      }
+    }
+  ]
+}
