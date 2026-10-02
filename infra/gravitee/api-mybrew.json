@@ -29,7 +29,15 @@
           }
         ]
       }
-    ]
+    ],
+    "analytics": {
+      "enabled": true,
+      "logging": {
+        "mode": { "entrypoint": true, "endpoint": true },
+        "phase": { "request": true, "response": true },
+        "content": { "headers": true }
+      }
+    }
   },
   "plans": [
     {
