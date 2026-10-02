@@ -5,6 +5,7 @@
 #   API MyBrew ──> Catalogue (:3001, joignable uniquement sur le réseau Docker)
 #   Navigateur ──> Gateway Gravitee (:8082) ──> API MyBrew
 #   Navigateur ──> Console Gravitee (:8084) ──> API de management Gravitee (:8083)
+#   Navigateur ──> Portail Gravitee (:4100) ──> API de management Gravitee (:8083)
 #   Gateway Gravitee ──> Elasticsearch (métriques des requêtes) <── API de management Gravitee
 
 name: mybrew
@@ -176,6 +177,9 @@ services:
       gravitee_management_mongodb_uri: mongodb://mongodb:27017/gravitee
       gravitee_analytics_elasticsearch_endpoints_0: http://elasticsearch:9200
       gravitee_console_url: ${GRAVITEE_CONSOLE_URL:-http://localhost:8084}
+      gravitee_portal_url: ${GRAVITEE_PORTAL_URL:-http://localhost:4100}
+      # Adresse de la gateway affichée sur le portail.
+      gravitee_portal_entrypoint: http://localhost:8082
     ports:
       - '8083:8083'
     networks:
@@ -193,6 +197,18 @@ services:
       MGMT_API_URL: ${MGMT_API_URL:-http://localhost:8083/management/}
     ports:
       - '8084:8080'
+    networks:
+      - mybrew
+    depends_on:
+      - management-api
+
+  portail:
+    image: graviteeio/apim-portal-ui:4.12.19
+    container_name: mybrew-portail
+    environment:
+      PORTAL_API_URL: ${PORTAL_API_URL:-http://localhost:8083/portal}
+    ports:
+      - '4100:8080'
     networks:
       - mybrew
     depends_on:

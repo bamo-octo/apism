@@ -20,6 +20,7 @@ start: ## Démarre l'API, le catalogue, la SPA, Keycloak et Gravitee
 	@echo "Keycloak ........... http://localhost:18080 (admin / admin)"
 	@echo "Gateway Gravitee ... http://localhost:8082"
 	@echo "Console Gravitee ... http://localhost:8084 (admin / admin)"
+	@echo "Portail Gravitee ... http://localhost:4100"
 
 stop: ## Arrête la stack
 	docker compose stop

@@ -42,8 +42,12 @@ if (apis.some((api) => api.name === 'MyBrew')) {
   process.exit();
 }
 
-const definition = (await readFile('api-mybrew.json', 'utf8')).replaceAll('${ORIGINE_SPA}', ORIGINE_SPA);
-const api = await appeler('POST', `${environnement}/apis/_import/definition`, JSON.parse(definition));
+const definition = JSON.parse((await readFile('api-mybrew.json', 'utf8')).replaceAll('${ORIGINE_SPA}', ORIGINE_SPA));
+const api = await appeler('POST', `${environnement}/apis/_import/definition`, definition);
+// L'import ignore lifecycleState : l'API est publiée sur le portail dans un second temps.
+if (definition.api.lifecycleState === 'PUBLISHED') {
+  await appeler('PUT', `${environnement}/apis/${api.id}`, { ...api, lifecycleState: 'PUBLISHED' });
+}
 const { data: plans } = await appeler('GET', `${environnement}/apis/${api.id}/plans`);
 
 const application = await appeler('POST', `${environnementV1}/applications`, {
@@ -51,7 +55,8 @@ const application = await appeler('POST', `${environnementV1}/applications`, {
   description: 'SPA MyBrew',
   settings: { app: { client_id: 'mybrew-web' } },
 });
-await appeler('POST', `${environnementV1}/applications/${application.id}/subscriptions?plan=${plans[0].id}`, {});
+const planJwt = plans.find((plan) => plan.security.type === 'JWT');
+await appeler('POST', `${environnementV1}/applications/${application.id}/subscriptions?plan=${planJwt.id}`, {});
 
 await appeler('POST', `${environnement}/apis/${api.id}/_start`);
 console.log("L'API MyBrew est importée et démarrée dans Gravitee.");
