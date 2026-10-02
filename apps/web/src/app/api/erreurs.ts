@@ -47,5 +47,9 @@ export const decrireErreur = (erreur: unknown): ErreurAffichable => {
     return { titre: 'Accès refusé', detail: detailDuCorps(erreur) };
   }
 
+  if (erreur.status === 429) {
+    return { titre: 'Limite atteinte', detail: detailDuCorps(erreur) };
+  }
+
   return { titre: `Erreur ${erreur.status}`, detail: detailDuCorps(erreur) };
 };
