@@ -18,15 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: {
-    sub: string;
-    preferred_username?: string;
-    resource_access?: Record<string, { roles: string[] }>;
-  }): Utilisateur {
-    return {
-      id: payload.sub,
-      nom: payload.preferred_username ?? payload.sub,
-      permissions: payload.resource_access?.[AUDIENCE]?.roles ?? [],
-    };
+  validate(payload: { sub: string; preferred_username?: string }): Utilisateur {
+    return { id: payload.sub, nom: payload.preferred_username ?? payload.sub };
   }
 }

@@ -2,6 +2,7 @@
 #   Navigateur ──> Keycloak (:18080) pour la connexion des utilisateurs
 #   Fournisseur ──> Keycloak (:18080) puis API MyBrew, avec un jeton d'accès
 #   Ascenseur ──> Keycloak (:18080) puis API MyBrew, pour le compte d'un utilisateur
+#   API MyBrew ──> Catalogue (:3001, joignable uniquement sur le réseau Docker)
 
 name: mybrew
 
@@ -47,8 +48,29 @@ services:
       # L'émetteur attendu est l'URL publique ; les clés publiques sont téléchargées via le réseau Docker.
       KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
       KEYCLOAK_URL_INTERNE: http://keycloak:8080
+      CATALOGUE_URL: http://catalogue:3001
+      # Jeton envoyé au catalogue : vide (aucun), `transmettre` (le jeton reçu) ou `echanger` (token exchange).
+      CATALOGUE_JETON: ''
+      # Secret du client `mybrew-api`, nécessaire pour échanger un jeton.
+      KEYCLOAK_CLIENT_SECRET: ''
     ports:
       - '3000:3000'
+    networks:
+      - mybrew
+    depends_on:
+      - catalogue
+
+  catalogue:
+    build:
+      context: ./apps/catalogue
+    image: mybrew/catalogue:formation
+    container_name: mybrew-catalogue
+    environment:
+      PORT: '3001'
+      # À 'true', le catalogue exige un jeton d'accès dont l'audience est `catalogue`.
+      CATALOGUE_JETON_OBLIGATOIRE: 'false'
+      KEYCLOAK_URL_PUBLIQUE: ${KEYCLOAK_URL_PUBLIQUE:-http://localhost:18080}
+      KEYCLOAK_URL_INTERNE: http://keycloak:8080
     networks:
       - mybrew
 

@@ -7,12 +7,20 @@
   "accessCodeLifespan": 300,
   "roles": {
     "client": {
-      "mybrew-api": [{ "name": "couler-cafe-mystere" }]
+      "catalogue": [{ "name": "couler-cafe-mystere" }]
     }
   },
   "clients": [
     {
       "clientId": "mybrew-api",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    },
+    {
+      "clientId": "catalogue",
       "publicClient": true,
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
@@ -47,6 +55,7 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
+      "fullScopeAllowed": false,
       "redirectUris": ["${ORIGINE_SPA}/*"],
       "webOrigins": ["${ORIGINE_SPA}"],
       "attributes": {
@@ -89,6 +98,7 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
+      "fullScopeAllowed": false,
       "attributes": {
         "oauth2.device.authorization.grant.enabled": "true"
       },
@@ -124,7 +134,7 @@
       "lastName": "Martin",
       "enabled": true,
       "credentials": [{ "type": "password", "value": "sara", "temporary": false }],
-      "clientRoles": { "mybrew-api": ["couler-cafe-mystere"] }
+      "clientRoles": { "catalogue": ["couler-cafe-mystere"] }
     },
     {
       "username": "chantal",

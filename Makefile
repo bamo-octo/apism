@@ -9,9 +9,10 @@ help: ## Affiche cette aide
 
 install: ## Installe les dépendances pour l'autocomplétion dans l'IDE
 	cd apps/api && npm ci
+	cd apps/catalogue && npm ci
 	cd apps/web && npm ci
 
-start: ## Démarre l'API, la SPA et Keycloak
+start: ## Démarre l'API, le catalogue, la SPA et Keycloak
 	docker compose up -d --build
 	@echo
 	@echo "SPA MyBrew .... http://localhost:4200"
@@ -25,13 +26,13 @@ clean: ## Supprime conteneurs et volumes : on repart de zéro
 	docker compose down -v
 
 build: ## Reconstruit les images applicatives
-	docker compose build api web
+	docker compose build api catalogue web
 
 status: ## État des conteneurs
 	docker compose ps -a
 
-logs: ## Suit les logs de l'API, de la SPA et de Keycloak
-	docker compose logs -f api web keycloak
+logs: ## Suit les logs de l'API, du catalogue, de la SPA et de Keycloak
+	docker compose logs -f api catalogue web keycloak
 
 ascenseur: ## Lance l'interface de l'ascenseur
 	docker compose run --rm ascenseur

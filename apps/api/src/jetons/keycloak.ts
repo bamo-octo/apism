@@ -9,3 +9,6 @@ export const URL_CLES_PUBLIQUES = `${URL_INTERNE}/realms/mybrew/protocol/openid-
 
 /** Audience attendue dans les jetons : le client Keycloak qui représente l'API MyBrew. */
 export const AUDIENCE = 'mybrew-api';
+
+/** Endpoint de Keycloak qui délivre les jetons, appelé par l'API pour échanger un jeton. */
+export const URL_JETONS = `${URL_INTERNE}/realms/mybrew/protocol/openid-connect/token`;

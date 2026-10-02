@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { peutCommander, trouverBoisson } from '../boissons/boisson.js';
+import { CatalogueService } from '../boissons/catalogue.service.js';
 import type { Utilisateur } from '../utilisateurs/utilisateur.js';
 import type { DemanderPreparationDto } from './dto/demander-preparation.dto.js';
 import type { Preparation } from './preparation.js';
@@ -12,12 +12,10 @@ const HISTORIQUE_MAXIMUM = 200;
 export class PreparationsService {
   private readonly historique: Preparation[] = [];
 
-  preparer(demande: DemanderPreparationDto, auteur?: Utilisateur): Preparation {
-    const boisson = trouverBoisson(demande.idBoisson);
+  constructor(private readonly catalogue: CatalogueService) {}
 
-    if (!boisson) {
-      throw new NotFoundException(`Boisson inconnue : ${demande.idBoisson}.`);
-    }
+  async preparer(demande: DemanderPreparationDto, auteur?: Utilisateur, jeton?: string): Promise<Preparation> {
+    const boisson = await this.catalogue.trouver(demande.idBoisson, jeton);
 
     const preparation: Preparation = {
       id: randomUUID(),

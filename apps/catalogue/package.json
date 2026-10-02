@@ -1,0 +1,15 @@
+{
+  "name": "catalogue",
+  "version": "1.0.0",
+  "description": "Catalogue des boissons de la machine à café",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "start": "node catalogue.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "jose": "^6.1.0"
+  }
+}
